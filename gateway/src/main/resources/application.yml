@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - name: CircuitBreaker
+          args:
+            fallbackUri: forward:/fallback
+        - TokenRelay=  # Token does not refresh automatically. https://github.com/spring-cloud/spring-cloud-security/issues/175
+        - RemoveRequestHeader=Cookie

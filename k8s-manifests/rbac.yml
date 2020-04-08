@@ -1,0 +1,42 @@
+# see https://github.com/spring-cloud/spring-cloud-kubernetes/blob/master/docs/src/main/asciidoc/security-service-accounts.adoc#service-account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sample
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: spring-cloud-kubernetes
+  labels:
+    # The view role on the service account is required in order to listen for config map changes.
+    # A higher level role (eg. edit) is required for secrets (secrets are not monitored by default).
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+rules:
+  - apiGroups:
+      - ""
+      - extensions
+      - apps
+    resources:
+      - configmaps
+      - pods
+      - services
+      - endpoints
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spring-cloud-kubernetes-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: spring-cloud-kubernetes
+subjects:
+  - kind: ServiceAccount
+    name: sample
+    namespace: default

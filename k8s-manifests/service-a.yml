@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: service-a
+  name: a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-a
+  template:
+    metadata:
+      labels:
+        app: service-a
+    spec:
+      containers:
+      - image: sample/service-a
+        name: service-a
+        env:
+          - name: _JAVA_OPTIONS
+            value: "-Xmx200m -XX:ReservedCodeCacheSize=22M -XX:MaxDirectMemorySize=22M -XX:MaxMetaspaceSize=84M -Xss512K"
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 256Mi
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/health
+            port: 8081
+            scheme: HTTP
+          initialDelaySeconds: 20
+          successThreshold: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/health
+            port: 8081
+            scheme: HTTP
+          initialDelaySeconds: 10
+          successThreshold: 1
+        imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: service-a
+    service: "true"
+  name: a
+spec:
+  ports:
+  - name: 80-8081
+    port: 80
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    app: service-a

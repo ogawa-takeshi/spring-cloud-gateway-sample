@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway
+data:
+  application.properties: |-
+    fallback.message=Service unavailable

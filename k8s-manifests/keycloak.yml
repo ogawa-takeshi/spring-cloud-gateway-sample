@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - image: jboss/keycloak
+          name: keycloak
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KEYCLOAK_USER
+              value: "keycloak"
+            - name: KEYCLOAK_PASSWORD
+              value: "keycloak"
+          resources:
+            requests:
+              cpu: 0.2
+              memory: 512M
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: keycloak
+  name: keycloak
+spec:
+  ports:
+    - name: 80-8080
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: keycloak
+#  type: LoadBalancer

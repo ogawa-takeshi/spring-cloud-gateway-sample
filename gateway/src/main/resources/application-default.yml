@@ -1,0 +1,35 @@
+spring:
+  cloud:
+    kubernetes:
+      enabled: false
+    gateway:
+      routes:
+        - id: service-a
+          uri: http://localhost:8081
+          predicates:
+            - Path=/a/**
+          filters:
+            - RewritePath=/a(?<segment>/?.*), $\{segment}
+        - id: service-b
+          uri: http://localhost:8082
+          predicates:
+            - Path=/b/**
+          filters:
+            - RewritePath=/b(?<segment>/?.*), $\{segment}
+  security:
+    oauth2:
+      client:
+        provider:
+          mocklab:
+            authorization-uri: https://oauth.mocklab.io/oauth/authorize
+            token-uri: https://oauth.mocklab.io/oauth/token
+            user-info-uri: https://oauth.mocklab.io/userinfo
+            user-name-attribute: sub
+            jwk-set-uri: https://oauth.mocklab.io/.well-known/jwks.json
+        registration:
+          mocklab:
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email, hello, bye
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            clientId: mocklab_oidc
+            clientSecret: whatever

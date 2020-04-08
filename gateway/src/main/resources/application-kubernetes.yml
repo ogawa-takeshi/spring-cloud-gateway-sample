@@ -1,0 +1,22 @@
+spring:
+  cloud:
+    kubernetes:
+      discovery:
+        filter: "metadata.labels['service']"
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          url-expression: "'http://'+serviceId"
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://keycloak.sample.test/auth/realms/sample
+        registration:
+          keycloak:
+            client-id: gateway
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+
+management.endpoints.web.exposure.include: '*'

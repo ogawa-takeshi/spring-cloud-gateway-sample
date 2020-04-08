@@ -1,0 +1,8 @@
+service.c: http://localhost:8083
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://oauth.mocklab.io/.well-known/jwks.json

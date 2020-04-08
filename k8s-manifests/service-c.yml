@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: service-c
+  name: c
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-c
+  template:
+    metadata:
+      labels:
+        app: service-c
+    spec:
+      containers:
+      - image: sample/service-c
+        name: service-c
+        env:
+          - name: _JAVA_OPTIONS
+            value: "-Xmx200m -XX:ReservedCodeCacheSize=22M -XX:MaxDirectMemorySize=22M -XX:MaxMetaspaceSize=84M -Xss512K"
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 256Mi
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/health
+            port: 8083
+            scheme: HTTP
+          initialDelaySeconds: 20
+          successThreshold: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/health
+            port: 8083
+            scheme: HTTP
+          initialDelaySeconds: 10
+          successThreshold: 1
+        imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: service-c
+  name: b
+spec:
+  ports:
+  - name: 80-8083
+    port: 80
+    protocol: TCP
+    targetPort: 8083
+  selector:
+    app: service-c

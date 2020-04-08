@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    kubernetes:
+      reload:
+        enabled: true
+      config:
+        sources:
+          - name: gateway
